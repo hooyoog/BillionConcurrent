@@ -41,19 +41,24 @@ void cmdThread( EasyTcpClient* client) {
 	}
 }
 
-int main() 
+int main()
 {
 	EasyTcpClient client;
+	
 	//client.InitSocket();
 	client.Connect("127.0.0.1", 14567);
+	
 
 	std::thread t(cmdThread, &client);
+	
 	t.detach();
+	
 	int num = 0;
-		
+
 	while (client.isRun())
 	{
 		client.OnRun();
+		
 	}
 	client.Close();
 

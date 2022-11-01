@@ -77,10 +77,10 @@ public:
 #endif
 		int err = connect(_server_sock, (sockaddr*)&_sin, sizeof(_sin));
 		if (err == SOCKET_ERROR) {
-			printf("connect error!!!\n");
+			printf("connect error!!!  <socket id = %d> - <%s:%d>\n", _server_sock, ip, port);
 		}
 		else {
-			printf("socket id = %d\n", _server_sock);
+			printf("connect <socket id = %d> - <%s:%d>\n", _server_sock,ip,port);
 		}
 		return err;
 	}
@@ -110,11 +110,12 @@ public:
 			fd_set fdReads;
 			FD_ZERO(&fdReads);
 			FD_SET(_server_sock, &fdReads);
-			timeval t = { 1 ,0 };
+			timeval t = { 0 ,0 };
 			int ret = select(_server_sock + 1, &fdReads, 0, 0, &t);
 			if (ret < 0)
 			{
 				printf("<socket = %d > select over.1 \n", _server_sock);
+				Close();
 				return false;
 			}
 			if (FD_ISSET(_server_sock, &fdReads))
@@ -123,6 +124,7 @@ public:
 				if (-1 == RecvData(_server_sock))
 				{
 					printf("<socket = %d > select over.2 \n", _server_sock);
+					Close();
 					return false;
 				}
 			}
@@ -162,20 +164,20 @@ public:
 		case LOGINRESULT:
 		{
 			Loginresult* logres = ((Loginresult*)head);//À©³ä³É´óµÄ
-			printf("recv Login result , lens: %d\n", logres->msgLens);
+			printf("<socket = %d> recv Login result , lens: %d\n",_server_sock, logres->msgLens);
 		}
 		break;
 		case LOGOUTRESULT:
 		{
 			Logoutresult* logres = ((Logoutresult*)head);
-			printf("recv Logout result , lens: %d\n", logres->msgLens);
+			printf("<socket = %d> recv Logout result , lens: %d\n", _server_sock,logres->msgLens);
 		}
 		break;
 
 		case NEW_USER_LOGIN:
 		{
 			New_user_login* logres = ((New_user_login*)head);
-			printf("recv new Login result £¬ lens: %d\n", logres->msgLens);
+			printf("<socket = %d> recv new Login result £¬ lens: %d\n", _server_sock,logres->msgLens);
 		}
 		break;
 		default:
